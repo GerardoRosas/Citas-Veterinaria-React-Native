@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableHighlight } from 'react-native';
 import Cita from './components/Cita';
 import Formulario from './components/Formulario';
 
 
 const App = () => {
+
+  const [ mostarForm, guardarMostrarForm ] = useState(true);
 
   const [citas, setCitas] = useState([
     {id: "1", paciente: "Hook", propietario: "Gerardo", sintomas: "Dolor de estómago"},
@@ -25,15 +27,30 @@ const App = () => {
       <View style={styles.contenedor}>
         <Text style={styles.encabezado}>Administrador de Citas</Text>
 
-        <Formulario />
+        <View>
+            <TouchableHighlight onPress={() => crearNuevaCita()} style={styles.btnMostrarForm}>
+                <Text style={styles.textoMostarForm}>Mostrar Formulario</Text>
+            </TouchableHighlight>
+        </View>
 
-        <Text style={styles.encabezado}>{citas.length > 0 ? 'Administra tus citas' : 'No hay citas, agrega una'}</Text>
+        <View style={styles.contenido}>
+          {mostarForm ? (
+              <Formulario />
+          ) : (
+            <>
+              <Text style={styles.encabezado}>{citas.length > 0 ? 'Administra tus citas' : 'No hay citas, agrega una'}</Text>
 
-        <FlatList
-          data={citas}
-          renderItem={({item}) => <Cita eliminarPaciente={eliminarPaciente} cita={item}/>}
-          keyExtractor={cita => cita.id}
-        />
+              <FlatList
+                style={styles.listado}
+                data={citas}
+                renderItem={({item}) => <Cita eliminarPaciente={eliminarPaciente} cita={item}/>}
+                keyExtractor={cita => cita.id}
+              />
+            </>
+          )}
+          
+          
+        </View>
 
       </View>
     </>
@@ -53,6 +70,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFF',
     marginBottom: 20
+  },
+  contenido:{
+    flex: 1,
+    marginHorizontal: '2.5%'
+  },
+  listado:{
+    flex: 1
+  },
+  btnMostrarForm:{
+      padding: 10,
+      backgroundColor: '#36486b',
+      marginVertical: 10
+  },
+  textoMostarForm: {
+      color:'#FFF',
+      fontWeight: 'bold',
+      textAlign: 'center'
   }
 });
 
