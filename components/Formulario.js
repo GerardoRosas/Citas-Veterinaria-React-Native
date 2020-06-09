@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, TouchableHighlight, Alert, ScrollView } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import shortid from 'shortid';
 
-const Formulario = () => {
+const Formulario = ({citas, setCitas, guardarMostrarForm}) => {
 
     
     const [paciente , guardarPaciente] = useState('');
@@ -57,6 +58,17 @@ const Formulario = () => {
             
             return;
         }
+
+        //Crear una nueva cita
+        const cita = { paciente, propietario, telefono, fecha, hora, sintomas };
+        cita.id = shortid.generate();
+        
+        //Agregar al state
+        const citasNuevo = [...citas, cita];
+        setCitas(citasNuevo);
+
+        //Ocultar el formulario
+        guardarMostrarForm(false);
     }
 
     //Muestra la alerta al validar validacion
@@ -88,11 +100,12 @@ const Formulario = () => {
                     <TextInput
                         style={styles.input}
                         onChangeText={(texto) => guardarPropietario(texto)}
+                        keyboardType='default'
                     />
                 </View>
 
                 <View>
-                    <Text style={styles.label}>Contacto</Text>
+                    <Text style={styles.label}>Tel. Contacto</Text>
                     <TextInput
                         style={styles.input}
                         onChangeText={(texto) => guardarTelefono(texto)}
@@ -137,6 +150,7 @@ const Formulario = () => {
                     <TextInput
                         style={styles.input}
                         onChangeText={(texto) => guardarSintomas(texto)}
+                        keyboardType='default'
                         multiline
                     />
                 </View>
@@ -172,7 +186,7 @@ const styles = StyleSheet.create({
     },
     botonSubmit:{
         padding: 10,
-        backgroundColor: '#36486b',
+        backgroundColor: '#622569', //36486b
         marginVertical: 10
     },
     textoNuevaCita: {

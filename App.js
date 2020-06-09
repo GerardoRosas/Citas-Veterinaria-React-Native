@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableHighlight, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Cita from './components/Cita';
 import Formulario from './components/Formulario';
 
@@ -8,12 +8,7 @@ const App = () => {
 
   const [ mostarForm, guardarMostrarForm ] = useState(true);
 
-  const [citas, setCitas] = useState([
-    {id: "1", paciente: "Hook", propietario: "Gerardo", sintomas: "Dolor de estómago"},
-    {id: "2", paciente: "React", propietario: "Fernanda", sintomas: "Dolor de garganta"},
-    {id: "3", paciente: "Script", propietario: "Ricardo", sintomas: "Se la pasa durmiendo"},
-    {id: "4", paciente: "iOS", propietario: "Mario", sintomas: "Es muy enojon"},
-  ]);
+  const [citas, setCitas] = useState([]);
 
   //funcion que elimina los pacientes del state
   const eliminarPaciente = (id) => {
@@ -22,38 +17,54 @@ const App = () => {
     })
   }
 
+  //Muestra u oculta el formualrio
+  const mostrarFormulario = () => {
+    guardarMostrarForm(!mostarForm);
+  }
+
+  //Ocultar el teclado
+  const cerrarTeclado = () => {
+    Keyboard.dismiss();
+  }
+
+
+  
   return (
-    <>
-      <View style={styles.contenedor}>
-        <Text style={styles.encabezado}>Administrador de Citas</Text>
+    <TouchableWithoutFeedback onPress={() => cerrarTeclado()}>
+        <View style={styles.contenedor}>
+          <Text style={styles.encabezado}>Administrador de Citas</Text>
 
-        <View>
-            <TouchableHighlight onPress={() => crearNuevaCita()} style={styles.btnMostrarForm}>
-                <Text style={styles.textoMostarForm}>Mostrar Formulario</Text>
-            </TouchableHighlight>
+          <View>
+              <TouchableHighlight onPress={() => mostrarFormulario()} style={styles.btnMostrarForm}>
+                  <Text style={styles.textoMostarForm}>{mostarForm ? 'Cancelar' : 'Crear Nueva Cita'}</Text>
+              </TouchableHighlight>
+          </View>
+
+          <View style={styles.contenido}>
+            {mostarForm ? (
+                <>
+                  <Text style={styles.encabezado}>Nueva Cita</Text>
+                  <Formulario 
+                    citas={citas}
+                    setCitas={setCitas}
+                    guardarMostrarForm={guardarMostrarForm}
+                  />
+                </>
+            ) : (
+              <>
+                <Text style={styles.encabezado}>{citas.length > 0 ? 'Administra tus citas' : 'No hay citas, agrega una'}</Text>
+
+                <FlatList
+                  style={styles.listado}
+                  data={citas}
+                  renderItem={({item}) => <Cita eliminarPaciente={eliminarPaciente} cita={item}/>}
+                  keyExtractor={cita => cita.id}
+                />
+              </>
+            )}
+          </View>
         </View>
-
-        <View style={styles.contenido}>
-          {mostarForm ? (
-              <Formulario />
-          ) : (
-            <>
-              <Text style={styles.encabezado}>{citas.length > 0 ? 'Administra tus citas' : 'No hay citas, agrega una'}</Text>
-
-              <FlatList
-                style={styles.listado}
-                data={citas}
-                renderItem={({item}) => <Cita eliminarPaciente={eliminarPaciente} cita={item}/>}
-                keyExtractor={cita => cita.id}
-              />
-            </>
-          )}
-          
-          
-        </View>
-
-      </View>
-    </>
+      </TouchableWithoutFeedback>
   );
 };
 
@@ -65,7 +76,7 @@ const styles = StyleSheet.create({
   },
   encabezado: {
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 50 : 20,
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFF',
@@ -80,8 +91,9 @@ const styles = StyleSheet.create({
   },
   btnMostrarForm:{
       padding: 10,
-      backgroundColor: '#36486b',
-      marginVertical: 10
+      backgroundColor: '#622569',
+      marginVertical: 10,
+      marginHorizontal: 10
   },
   textoMostarForm: {
       color:'#FFF',
